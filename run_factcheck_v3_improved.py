@@ -1,18 +1,25 @@
 """
-KI-Produkt-Faktencheck · Automatisches Fact-Checking V3 IMPROVED
+KI-Produkt-Faktencheck · Automatisches Fact-Checking V5 mit Airtable
+
+VERBESSERUNGEN gegenüber V4:
+✓ Layer 0: Airtable - Kuratierte verifizierte Fakten (Semantic Search, checked FIRST!)
+✓ Voyage-Embeddings für schnelle Semantic Similarity (Threshold: 0.85)
+✓ 24h-Cache für Airtable-Embeddings (Performance-Optimierung)
 
 VERBESSERUNGEN gegenüber V2:
 ✓ Kategorische Konfidenz (hoch/mittel/niedrig) statt irreführender numerischer Werte
 ✓ Quellen-URLs werden extrahiert und gespeichert für manuelle Verifikation
 ✓ Konsistenz-Checks: source_type=none MUSS bewertung=NICHT_PRÜFBAR sein
 ✓ quellen_qualität wird vom LLM basierend auf tatsächlichen Quellen bewertet
-✓ Deutsch→Englisch-Übersetzung für Google Scholar Queries
+✓ Deutsch→Englisch-Übersetzung für Semantic Scholar/OpenAlex Queries
 ✓ System-Prompt bereinigt (nur "gut|schwach", kein "mittel")
 
-HYBRID-RECHERCHE:
+5-LAYER HYBRID-RECHERCHE:
+- Layer 0: Airtable - Kuratierte Facts (Semantic Search, Opus Research) ← NEU!
 - Layer 1: Perplexity - Schnelle Web-Suche + aktuelle Quellen
 - Layer 2: USDA FoodData - Nährwertdaten (Protein, Fett, Vitamine etc.)
-- Layer 3: Semantic Scholar - 200M wissenschaftliche Papers (stable API, kein Selenium)
+- Layer 3: Semantic Scholar - 200M wissenschaftliche Papers (stable API)
+- Layer 4: OpenAlex - 250M+ wissenschaftliche Works (free, no API key)
 
 Aufruf:
     python run_factcheck_v3_improved.py --mode sample --limit 10
@@ -341,22 +348,139 @@ async def search_semantic_scholar(claim: str, client: AsyncAnthropic, max_result
         return None, []
 
 
+async def search_openalex(claim: str, client: AsyncAnthropic, max_results: int = 5) -> Tuple[Optional[str], List[str]]:
+    """
+    Sucht wissenschaftliche Papers via OpenAlex API (250M+ works, free, no API key).
+
+    OpenAlex ist eine offene Alternative zu Scopus/WoS mit >250M wissenschaftlichen Werken.
+    Kein API Key erforderlich, keine strikten Rate Limits.
+    """
+    import aiohttp
+
+    try:
+        # 1. Übersetze Claim ins Englische
+        english_query = await translate_to_english(claim, client)
+
+        # 2. OpenAlex Works Search API
+        url = "https://api.openalex.org/works"
+        params = {
+            "search": english_query,
+            "per_page": max_results,
+            "sort": "cited_by_count:desc",  # Sortiere nach Zitationen
+            "filter": "type:article"  # Nur Artikel (keine Books, etc.)
+        }
+
+        headers = {
+            "User-Agent": "KI-Produkt-Faktencheck/1.0 (mailto:research@example.com)"
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=headers) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    works = data.get("results", [])
+
+                    if not works:
+                        return None, []
+
+                    results = [f"OPENALEX ERGEBNISSE (Query: '{english_query}'):\n"]
+                    urls = []
+
+                    for i, work in enumerate(works):
+                        title = work.get("title", "Kein Titel")
+
+                        # Autoren extrahieren
+                        authorships = work.get("authorships", [])
+                        author_names = ", ".join([
+                            a.get("author", {}).get("display_name", "")
+                            for a in authorships[:3]
+                        ])
+
+                        # Jahr
+                        year = work.get("publication_year", "o.J.")
+
+                        # Abstract (falls verfügbar)
+                        abstract = work.get("abstract_inverted_index", {})
+                        abstract_text = ""
+                        if abstract:
+                            # Rekonstruiere Abstract aus inverted index (nimm erste 200 chars)
+                            words = []
+                            for word, positions in list(abstract.items())[:50]:
+                                words.append(word)
+                            abstract_text = " ".join(words)[:200]
+
+                        # Zitationen
+                        cited_by_count = work.get("cited_by_count", 0)
+
+                        # URL: Primäre OpenAlex-Seite
+                        work_url = work.get("id", "")  # OpenAlex ID (URL)
+
+                        # Optional: Open Access PDF URL
+                        open_access = work.get("open_access", {})
+                        oa_url = open_access.get("oa_url")
+
+                        results.append(f"\n[{i+1}] {title}")
+                        results.append(f"    Autoren: {author_names}")
+                        results.append(f"    Jahr: {year} | Zitationen: {cited_by_count}")
+
+                        if abstract_text:
+                            results.append(f"    Abstract: {abstract_text}...")
+
+                        # Bevorzuge OA PDF, sonst OpenAlex-Seite
+                        if oa_url:
+                            results.append(f"    URL: {oa_url}")
+                            urls.append(oa_url)
+                        elif work_url:
+                            results.append(f"    URL: {work_url}")
+                            urls.append(work_url)
+
+                    return "\n".join(results), urls
+                else:
+                    return None, []
+
+    except Exception:
+        return None, []
+
+
 async def hybrid_search(
     claim: str,
     perplexity_key: str,
     usda_key: str,
-    client: AsyncAnthropic
+    client: AsyncAnthropic,
+    voyage_key: Optional[str] = None
 ) -> Tuple[str, str, List[str]]:
     """
-    3-Layer Hybrid-Suche:
+    5-Layer Hybrid-Suche:
+    0. Airtable (Kuratierte verifizierte Facts, Semantic Search) ← Checked FIRST!
     1. Perplexity (schnell, aktuelle Web-Quellen)
     2. USDA FoodData (für Nährwert-Claims)
     3. Semantic Scholar (200M wissenschaftliche Papers, stable API)
+    4. OpenAlex (250M+ works, free, keine API-Key erforderlich)
 
     Returns:
         (sources_text, source_type, urls_list)
-        source_type: "perplexity", "usda", "semantic_scholar", "perplexity+usda", "semantic_scholar+usda", "none"
+        source_type: "airtable", "perplexity", "usda", "semantic_scholar", "openalex",
+                     "perplexity+usda", "semantic_scholar+usda", "openalex+usda", "none"
     """
+
+    # Layer 0: Versuche Airtable zuerst (cached, ultra-schnell, hochwertige Quellen)
+    if voyage_key and os.environ.get("AIRTABLE_API_TOKEN") and os.environ.get("AIRTABLE_BASE_ID"):
+        try:
+            from airtable_search import search_airtable_facts
+
+            airtable_result, airtable_urls = await search_airtable_facts(
+                claim=claim,
+                voyage_key=voyage_key
+            )
+
+            if airtable_result:
+                print(f"      ✓ Airtable Match gefunden (Similarity > 0.85)", flush=True)
+                return airtable_result, "airtable", airtable_urls
+
+        except ImportError:
+            pass  # airtable_search.py nicht vorhanden, skip Layer 0
+        except Exception as e:
+            print(f"      → Airtable failed: {e}", flush=True)
 
     # Layer 1: Versuche Perplexity zuerst (schneller)
     perplexity_result, perplexity_urls = await search_web_perplexity(claim, perplexity_key)
@@ -386,8 +510,19 @@ async def hybrid_search(
     if scholar_result:
         return scholar_result, "semantic_scholar", scholar_urls
 
-    # Layer 4: Keine Quellen gefunden
-    return "Keine Quellen verfügbar (weder Perplexity noch USDA noch Semantic Scholar).", "none", []
+    # Layer 4: Fallback auf OpenAlex (250M+ works, free)
+    print(f"      → Semantic Scholar failed, trying OpenAlex...", flush=True)
+    openalex_result, openalex_urls = await search_openalex(claim, client, max_results=3)
+
+    if openalex_result and usda_result:
+        combined = f"{openalex_result}\n\n{'='*70}\n\n{usda_result}"
+        return combined, "openalex+usda", openalex_urls + usda_urls
+
+    if openalex_result:
+        return openalex_result, "openalex", openalex_urls
+
+    # Layer 5: Keine Quellen gefunden
+    return "Keine Quellen verfügbar (weder Perplexity noch USDA noch Semantic Scholar noch OpenAlex).", "none", []
 
 
 async def factcheck_claim_async(
@@ -406,7 +541,8 @@ async def factcheck_claim_async(
     async with semaphore:
         # 1. Hybrid-Recherche mit URL-Extraktion
         print(f"  [{canonical_id}] Recherchiere...", flush=True)
-        sources, source_type, urls = await hybrid_search(claim_text, perplexity_key, usda_key, client)
+        voyage_key = os.environ.get("VOYAGE_API_KEY")  # Optional für Airtable Layer 0
+        sources, source_type, urls = await hybrid_search(claim_text, perplexity_key, usda_key, client, voyage_key)
 
         # 2. Claude Fact-Check
         user_msg = FACTCHECK_USER_TEMPLATE.format(
