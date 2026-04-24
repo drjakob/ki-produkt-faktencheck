@@ -1,0 +1,112 @@
+# KI-Produkt-Faktencheck · Python Dependencies
+#
+# Installation:
+#   pip install -r requirements.txt
+#
+# Virtual Environment Setup (empfohlen):
+#   python3 -m venv venv_extraction
+#   source venv_extraction/bin/activate  # macOS/Linux
+#   # oder: venv_extraction\Scripts\activate  # Windows
+#   pip install -r requirements.txt
+
+# ============================================================
+# CORE DEPENDENCIES
+# ============================================================
+
+# Claude AI (Claim Extraction + Fact-Check Bewertung)
+anthropic>=0.39.0
+
+# Async HTTP Client (für Perplexity API)
+aiohttp>=3.9.0
+
+# Data Processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# Voyage AI (Embeddings für Deduplication)
+voyageai>=0.2.0
+
+# Machine Learning / Clustering
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# Google Scholar Search
+scholarly>=1.7.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+
+# ============================================================
+# OPTIONAL DEPENDENCIES
+# ============================================================
+
+# Jupyter Notebooks (für Analyse)
+# jupyter>=1.0.0
+# ipykernel>=6.25.0
+
+# Testing
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+
+# Code Quality
+# black>=23.7.0
+# flake8>=6.1.0
+# mypy>=1.5.0
+
+
+# ============================================================
+# VERSION NOTES
+# ============================================================
+#
+# Python Version: 3.9+
+#
+# anthropic:
+#   - Verwendet für Claude Sonnet 4.6
+#   - Async-Client: AsyncAnthropic
+#
+# aiohttp:
+#   - Für async Perplexity API-Calls
+#   - Alternative zu requests für async
+#
+# voyageai:
+#   - State-of-the-art Embeddings
+#   - voyage-3-large (1024 dim)
+#
+# scholarly:
+#   - Google Scholar Scraping via Selenium
+#   - Automatischer WebDriver-Download
+#   - Kann instabil sein (Rate-Limiting)
+#
+# scikit-learn + scipy:
+#   - Für Hierarchical Clustering
+#   - Cosine Similarity
+#   - Agglomerative Clustering
+#
+# ============================================================
+# SYSTEM REQUIREMENTS
+# ============================================================
+#
+# 1. Python 3.9 oder höher
+# 2. ~500 MB RAM pro Worker (bei parallel=30 → ~15 GB)
+# 3. Selenium WebDriver (automatisch via scholarly)
+# 4. Internet-Verbindung für API-Calls
+#
+# ============================================================
+# INSTALLATION TROUBLESHOOTING
+# ============================================================
+#
+# macOS (M1/M2):
+#   # Falls NumPy/SciPy Probleme machen
+#   pip install --upgrade pip
+#   pip install numpy --pre -U -f https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
+#   pip install -r requirements.txt
+#
+# Windows:
+#   # Microsoft Visual C++ 14.0 erforderlich für scipy
+#   # Download: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+#
+# Linux:
+#   # System-Pakete für scipy/sklearn
+#   sudo apt-get install python3-dev gcc g++ gfortran libopenblas-dev liblapack-dev
+#   pip install -r requirements.txt
