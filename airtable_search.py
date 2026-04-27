@@ -8,7 +8,7 @@ Workflow:
 1. Generiere Voyage-Embedding für eingehenden Claim
 2. Lade alle Fact-Embeddings aus Airtable
 3. Berechne Cosine-Similarity
-4. Returniere Top-Match falls Similarity > threshold (0.85)
+4. Returniere Top-Match falls Similarity > threshold (0.75)
 
 Performance-Optimierung:
 - Embeddings werden lokal gecacht (JSON)
@@ -32,7 +32,7 @@ from pyairtable import Api
 # CONFIG
 # ============================
 
-SIMILARITY_THRESHOLD = 0.80  # Konservativ aber realistisch (berücksichtigt document vs. query embeddings)
+SIMILARITY_THRESHOLD = 0.75  # V8: Senken für mehr Airtable Matches (vorher 0.80)
 CACHE_DIR = Path(__file__).parent / ".cache"
 CACHE_TTL_HOURS = 24
 
@@ -239,7 +239,7 @@ async def search_airtable_facts(
     Args:
         claim: Eingehender Claim
         voyage_key: Voyage API Key
-        similarity_threshold: Minimum Similarity (default: 0.85)
+        similarity_threshold: Minimum Similarity (default: 0.75)
         force_refresh: Falls True, ignoriere Cache
 
     Returns:
@@ -359,7 +359,7 @@ async def main():
         print(sources_text, flush=True)
         print(f"\nURLs: {urls}\n", flush=True)
     else:
-        print("Kein Match gefunden (Similarity < 0.85)\n", flush=True)
+        print("Kein Match gefunden (Similarity < 0.75)\n", flush=True)
 
 
 if __name__ == "__main__":

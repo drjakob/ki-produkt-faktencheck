@@ -1,9 +1,12 @@
 """
-KI-Produkt-Faktencheck · Automatisches Fact-Checking V5 mit Airtable
+KI-Produkt-Faktencheck · Automatisches Fact-Checking V8 mit Airtable
+
+VERBESSERUNGEN gegenüber V7:
+✓ Similarity-Threshold gesenkt: 0.85 → 0.75 für mehr Airtable Matches
 
 VERBESSERUNGEN gegenüber V4:
 ✓ Layer 0: Airtable - Kuratierte verifizierte Fakten (Semantic Search, checked FIRST!)
-✓ Voyage-Embeddings für schnelle Semantic Similarity (Threshold: 0.85)
+✓ Voyage-Embeddings für schnelle Semantic Similarity (Threshold: 0.75, V8 Optimierung)
 ✓ 24h-Cache für Airtable-Embeddings (Performance-Optimierung)
 
 VERBESSERUNGEN gegenüber V2:
@@ -474,7 +477,7 @@ async def hybrid_search(
             )
 
             if airtable_result:
-                print(f"      ✓ Airtable Match gefunden (Similarity > 0.85)", flush=True)
+                print(f"      ✓ Airtable Match gefunden (Similarity > 0.75)", flush=True)
                 return airtable_result, "airtable", airtable_urls
 
         except ImportError:
