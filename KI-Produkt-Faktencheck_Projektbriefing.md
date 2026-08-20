@@ -4,7 +4,7 @@
 
 Ein Schwesterprojekt zum KI-Produktmonitor. Ziel: die in den KI-Antworten gefundenen Claims systematisch auf Faktentreue prüfen und die Ergebnisse als Evidenzschicht ins Whitepaper einziehen.
 
-**Änderungen gegenüber v0.1:** Entscheidungen aus Runde 2 eingearbeitet; Score-Skala 6-stufig (Option B); Embeddings mit Voyage; Kathi Böhmer als Triage-Instanz; max. 150 Claims an Nutrition Hub; Claude Opus 4.7 übernimmt erweiterten Anteil der Prüfarbeit; Start parallel zum Whitepaper.
+**Änderungen gegenüber v0.1:** Entscheidungen aus Runde 2 eingearbeitet; Score-Skala 6-stufig (Option B); Embeddings mit Voyage; dedizierte Triage-Instanz; max. 150 Claims an Nutrition Hub; Claude Opus 4.7 übernimmt erweiterten Anteil der Prüfarbeit; Start parallel zum Whitepaper.
 
 ---
 
@@ -83,7 +83,7 @@ Die atomare Einheit. Ein Claim, einmal; egal wie oft er in den Antworten auftauc
 | claim_type | Single select | Zahl / Studienlage / qualitativ / Werturteil |
 | deutschland_bezug | Single select | ja / nein / unklar |
 | frequency | Rollup from Instances | Anzahl Vorkommen in den Antworten |
-| kathi_triage | Single select | 🟢 einfach / 🟡 mittel / 🔴 komplex / ⚫ verworfen |
+| triage_status | Single select | 🟢 einfach / 🟡 mittel / 🔴 komplex / ⚫ verworfen |
 | nutrition_hub_queue | Checkbox | Geht an Nutrition Hub (max. 150 insgesamt) |
 | haase_queue | Checkbox | Geht an Hendrik Haase |
 | status | Single select | neu / extrahiert / dedupliziert / LLM-geprüft / triagiert / final |
@@ -124,7 +124,7 @@ Die Bewertung. Ein Eintrag pro Claim.
 | quelle_2_verified | Checkbox | |
 | quelle_3 | URL + Text | optional |
 | ist_strittig | Checkbox | wissenschaftliche Studienlage heterogen |
-| geprüft_von | Multi select | Opus / Kathi / Haase / Nutrition Hub / Datenteam |
+| geprüft_von | Multi select | Opus / Triage / Haase / Nutrition Hub / Datenteam |
 | prüfdatum | Date | |
 | kommentar | Long text | Kontext, Einschränkungen, Kuriositäten |
 
@@ -169,17 +169,17 @@ Die Bewertung. Ein Eintrag pro Claim.
 
 **Kostenschätzung:** ~300 Claims x 2 Opus-Durchläufe mit Web Search; ca. 80 bis 120 Euro.
 
-### Phase D · Kathi-Triage (Rohprüfung und Vorsortierung)
+### Phase D · Triage (Rohprüfung und Vorsortierung)
 
 **Input:** Alle geprüften Claims aus Phase C.
-**Kathis Aufgabe:**
+**Aufgabe der Triage:**
 
 - **🟢 einfach** · Opus-Konsens bei trivialen Claims (Nährwerte, Definitionen); nur Stichprobenprüfung durch Datenteam nötig
 - **🟡 mittel** · Opus-Vorschlag plausibel, braucht Datenteam-Review, keine externe Fachperson
 - **🔴 komplex** · ernährungsmedizinisch heikel, strittig, oder Branchenkontext; geht an Nutrition Hub **(max. 150)** oder Hendrik Haase
 - **⚫ verworfen** · kein echter Claim, Dubletten, nicht prüfbare Werturteile
 
-**Kathis Zeitbudget:** ~300 Claims x 3 min = ~15 Stunden. Sie setzt auch den Haken für `nutrition_hub_queue` und `haase_queue`.
+**Zeitbudget Triage:** ~300 Claims x 3 min = ~15 Stunden. Die Triage setzt auch den Haken für `nutrition_hub_queue` und `haase_queue`.
 
 **Triage-Regeln für Nutrition Hub Queue:**
 - Alle 🌀 umstrittenen Claims
@@ -209,14 +209,14 @@ Die Bewertung. Ein Eintrag pro Claim.
 | Projektleitung | Jakob (tactile.news) | Methodik, Freigabe, Whitepaper-Integration | laufend |
 | LLM-Automation | Claude Opus 4.7 (2 Instanzen) | Extraktion, Dedup-Vorschlag, Score-Vorschlag, Web Search | API-Kosten ~150 Euro |
 | Datenteam | — | Pilot-Review, Dedup-Grenzfälle, URL-Verifikation, Orchestrierung | 20 bis 30 h |
-| Triage | Kathi Böhmer | Rohprüfung, Vorsortierung, Queue-Verteilung | ~15 h |
+| Triage | — | Rohprüfung, Vorsortierung, Queue-Verteilung | ~15 h |
 | Fachgutachten 1 | Nutrition Hub | max. 150 priorisierte Claims | ~25 h |
 | Fachgutachten 2 | Hendrik Haase | ~30 bis 60 praxisnahe Claims | ~5 h |
 | Auftraggeber | Initiative Produkt (Kerstin Wriedt) | Sieht Ergebnisse, bewertet nicht | review-Termine |
 
 **Gesamt-Menschzeit: 65 bis 75 Stunden**, verteilt auf mehrere Rollen; parallelisiert in ~1,5 Wochen machbar.
 
-**Regel gegen Bias-Vorwürfe:** Die Initiative Produkt sieht das Ergebnis, **bewertet aber nicht**. Scoring-Entscheidungen liegen bei Kathi (Triage), Datenteam, Nutrition Hub und Haase.
+**Regel gegen Bias-Vorwürfe:** Die Initiative Produkt sieht das Ergebnis, **bewertet aber nicht**. Scoring-Entscheidungen liegen bei Triage, Datenteam, Nutrition Hub und Haase.
 
 ---
 
@@ -308,11 +308,11 @@ OUTPUT:
 | Opus halluziniert Quellen | Web Search Pflicht; URL-Verifikation automatisch; zweite Opus-Instanz als Gegenprüfer; manuelle Stichprobe 10 % |
 | Zwei Opus-Instanzen sind sich systematisch einig und beide falsch | Stichprobenprüfung durch Datenteam auf 10 % der "grünen" Claims; Fehlerquote-Monitoring |
 | Dedup lumpt verschiedene Claims zusammen | Manuelles Review der Cluster-Grenzfälle vor Freigabe |
-| Bias-Vorwurf | Scoring nicht durch Auftraggeber; Fachgutachten durch Kathi, Nutrition Hub, Haase; Methodik transparent im Whitepaper |
+| Bias-Vorwurf | Scoring nicht durch Auftraggeber; Fachgutachten durch Triage, Nutrition Hub, Haase; Methodik transparent im Whitepaper |
 | Strittige Claims werden zu Unrecht als ❌ markiert | Separate 🌀-Kategorie; Widerspruchsregel in Quellenhierarchie |
 | Umfang wächst unkontrolliert | Phase 1 hart auf Ernährung begrenzt; Gate vor Phase 2 |
 | Termindruck republica | Pilot auf 20 Antworten zuerst; bei Problemen früh abbrechen |
-| Nutrition Hub überlastet | Harte Grenze bei 150 Claims; Triage durch Kathi vorher |
+| Nutrition Hub überlastet | Harte Grenze bei 150 Claims; Triage vorher |
 
 ---
 
@@ -330,7 +330,7 @@ OUTPUT:
 
 **Woche 3:**
 - Phase C Opus-Fact-Check mit Gegenprüfung
-- Phase D Kathi-Triage
+- Phase D Triage
 - Phase E Fachgutachten starten (Haase, Nutrition Hub)
 
 **Woche 4:**
