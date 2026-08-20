@@ -1,4 +1,4 @@
-# Quick Start für Till
+# Quick Start
 
 **Willkommen!** Dieses Dokument bringt dich in 15 Minuten auf Betriebstemperatur.
 
@@ -6,10 +6,10 @@
 
 ## Was du brauchst
 
-- macOS (das ist Jakobs Setup)
-- Python 3.9+ (sollte schon installiert sein)
-- Zugang zu diesem Ordner (Google Drive)
-- API-Keys (sind schon im Code hinterlegt, siehe unten)
+- macOS oder Linux
+- Python 3.9+
+- Zugang zum Projekt-Ordner
+- API-Keys (siehe `.env.example`)
 
 ---
 
@@ -18,7 +18,7 @@
 ### 1. Terminal öffnen und ins Projekt navigieren
 
 ```bash
-cd "/Users/3g2-43a-u1/Library/CloudStorage/GoogleDrive-drjakobvicari@gmail.com/Meine Ablage/HSH-2025/JakobsProjekte2025/Produktreporting/Faktenchecker"
+cd /pfad/zum/Faktenchecker
 ```
 
 ### 2. Virtual Environment erstellen
@@ -54,7 +54,7 @@ cp .env.example .env
 source .env  # oder manuell exportieren
 
 # 3. Test-Run mit 5 Claims
-python run_factcheck_v2.py --mode sample --limit 5 --output test_till.csv
+python run_factcheck_v2.py --mode sample --limit 5 --output test_run.csv
 ```
 
 **Erwartetes Ergebnis:**
@@ -70,19 +70,19 @@ Batch 1/1 wird verarbeitet...
   [CC0767] ✓ FALSCH (Konfidenz: 0.90, Quellen: perplexity)
   ...
 
-Ergebnisse gespeichert: test_till.csv
+Ergebnisse gespeichert: test_run.csv
 ```
 
-Schau dir dann `test_till.csv` an:
+Schau dir dann `test_run.csv` an:
 
 ```bash
-cat test_till.csv | head -20
+cat test_run.csv | head -20
 ```
 
 oder
 
 ```bash
-open test_till.csv  # Öffnet in Numbers/Excel
+open test_run.csv  # Öffnet in Numbers/Excel
 ```
 
 ---
@@ -91,16 +91,16 @@ open test_till.csv  # Öffnet in Numbers/Excel
 
 ### Lies als Erstes (in dieser Reihenfolge):
 
-1. **README.md** (du bist hier) - Projekt-Übersicht
-2. **Diese Datei** (QUICK_START_TILL.md) - Schnelleinstieg
+1. **README.md** - Projekt-Übersicht
+2. **Diese Datei** (QUICK_START.md) - Schnelleinstieg
 3. **ARCHITEKTUR.md** - Technische Details (nur wenn du tiefer einsteigen willst)
 
 ### Haupt-Scripts:
 
 | Datei | Was macht es? | Wann brauchst du es? |
 |-------|---------------|----------------------|
-| `run_factcheck_v2.py` | **Fact-Checking** (Perplexity + Scholar) | **START HIER** für Fact-Checks |
-| `run_factcheck_v3.py` | Fact-Checking mit 4-Layer-Fallback | Nur wenn V2 zu viele Fehler hat |
+| `run_factcheck_v3_improved.py` | **Fact-Checking V8** (5-Layer Hybrid inkl. Airtable) | **START HIER** für Fact-Checks |
+| `run_factcheck_v2.py` | Fact-Checking (Perplexity + Scholar) | Ältere Version, einfacher Aufbau |
 | `dedup_claims.py` | Claim-Deduplizierung | Nur wenn neue Claims extrahiert wurden |
 | `run_extraction_v2.py` | Claim-Extraction aus AI-Antworten | Nur wenn neue AI-Responses reinkommen |
 
@@ -109,8 +109,8 @@ open test_till.csv  # Öffnet in Numbers/Excel
 | Datei | Was ist drin? | Wichtigkeit |
 |-------|---------------|-------------|
 | `claims_canonical.csv` | **1.046 deduplizierte Claims** | **INPUT** für Fact-Checking |
-| `claims_factchecked_v2_full.csv` | **Full-Run Ergebnisse** (V2) | **OUTPUT** - Haupt-Ergebnis |
-| `claims_factchecked_v3_test.csv` | V3 Test-Ergebnisse (27 Claims) | Vergleich V2 vs V3 |
+| `claims_factchecked_v8_lower_threshold.csv` | **Aktuellste Full-Run Ergebnisse** (V8) | **OUTPUT** - Haupt-Ergebnis |
+| `claims_factchecked_v2_full.csv` | Full-Run Ergebnisse (V2) | Ältere Version zum Vergleich |
 | `FACTCHECK_V2_VERGLEICH.md` | V1 vs V2 Evaluierung | Analyse der Verbesserungen |
 
 ---
@@ -152,13 +152,13 @@ python run_factcheck_v2.py \
 
 ```bash
 # Erste 20 Zeilen
-head -20 test_till.csv
+head -20 test_run.csv
 
 # Nur Bewertungs-Spalten
-cut -d';' -f2,7,8,9 test_till.csv | head -20
+cut -d';' -f2,7,8,9 test_run.csv | head -20
 
 # Zähle Bewertungen
-cut -d';' -f7 test_till.csv | sort | uniq -c
+cut -d';' -f7 test_run.csv | sort | uniq -c
 ```
 
 ### In Python (analytisch)
@@ -166,7 +166,7 @@ cut -d';' -f7 test_till.csv | sort | uniq -c
 ```python
 import pandas as pd
 
-df = pd.read_csv('test_till.csv', sep=';')
+df = pd.read_csv('test_run.csv', sep=';')
 
 # Bewertungs-Verteilung
 print(df['bewertung'].value_counts())
@@ -185,7 +185,7 @@ print(richtig[['canonical_text', 'begründung']])
 
 ### Q: Warum gibt's so viele NICHT_PRÜFBAR?
 
-**A:** Im V2 Full-Run: 84% NICHT_PRÜFBAR, hauptsächlich wegen Perplexity API-Instabilität. Im V3-Test lief es perfekt → API-Problem, kein System-Problem.
+**A:** Im V2 Full-Run: 84% NICHT_PRÜFBAR, hauptsächlich wegen Perplexity API-Instabilität. Im V3-Test lief es perfekt → API-Problem, kein System-Problem. Die neueren Versionen (V5–V8) reduzieren das durch den Airtable-Layer 0 und niedrigere Similarity-Schwellen.
 
 **Gründe (echt):**
 - `keine_quellen`: 77% - Perplexity + Scholar finden nichts
@@ -194,9 +194,9 @@ print(richtig[['canonical_text', 'begründung']])
 
 ### Q: Welches Script soll ich verwenden?
 
-**A:** Für normale Fact-Checks: **run_factcheck_v2.py** (Hybrid Search)
+**A:** Für aktuelle Fact-Checks: **run_factcheck_v3_improved.py** (V8, 5-Layer Hybrid)
 
-**Nur wenn V2 zu viele Fehler produziert:** run_factcheck_v3.py (4-Layer Fallback)
+**Für einen einfacheren Einstieg:** run_factcheck_v2.py (Perplexity + Scholar)
 
 ### Q: Wie lange dauert ein Full-Run?
 
@@ -214,7 +214,7 @@ print(richtig[['canonical_text', 'begründung']])
 
 ### Q: Kann ich einen Run abbrechen?
 
-**A:** Ja! **Ctrl+C** stoppt den Run. Du kannst mit `--resume` weitermachen (aber nicht implementiert in V2, TODO).
+**A:** Ja! **Ctrl+C** stoppt den Run. Bei den neueren Versionen kannst du mit `--resume` weitermachen.
 
 ---
 
@@ -259,7 +259,7 @@ python run_factcheck_v2.py \
 import pandas as pd
 
 # Lade Ergebnisse
-df = pd.read_csv('claims_factchecked_v2_full.csv', sep=';')
+df = pd.read_csv('claims_factchecked_v8_lower_threshold.csv', sep=';')
 
 # Top 10 häufigste RICHTIG-Claims
 richtig = df[df['bewertung'] == 'RICHTIG']
@@ -336,16 +336,16 @@ python run_factcheck_v2.py --mode sample --limit 5 --parallel 5
 
 1. ✅ Setup testen (oben)
 2. ✅ Test-Run durchführen (5 Claims)
-3. ✅ Ergebnisse anschauen (`test_till.csv`)
+3. ✅ Ergebnisse anschauen (`test_run.csv`)
 4. ✅ README.md durchlesen
 
 ### Danach:
 
-1. **Code-Review**: Schau dir `run_factcheck_v2.py` an
-   - Ist die Hybrid-Search-Logik klar?
+1. **Code-Review**: Schau dir `run_factcheck_v3_improved.py` an
+   - Ist die 5-Layer-Hybrid-Search-Logik klar?
    - Verstehst du den Fact-Checking-Flow?
 
-2. **Full-Run anschauen**: `claims_factchecked_v2_full.csv`
+2. **Full-Run anschauen**: `claims_factchecked_v8_lower_threshold.csv`
    - Sind Bewertungen nachvollziehbar?
    - Welche Claims sind RICHTIG/FALSCH?
 
@@ -353,10 +353,12 @@ python run_factcheck_v2.py --mode sample --limit 5 --parallel 5
    - Perplexity-Stabilität (Retry-Mechanismus?)
    - Alternative Quellen (CrossRef statt Scholar?)
    - Claim-Refinement (vage Claims konkreter machen?)
+   - Anwendung auf neue Themen/Domänen (nicht nur Ernährung)
 
 ### Optional (nur wenn du tiefer einsteigen willst):
 
 - **ARCHITEKTUR.md** lesen (technische Details)
+- **ENTWICKLER_DEEP_DIVE.md** lesen (tiefe technische Doku)
 - **FACTCHECK_V2_VERGLEICH.md** lesen (V1 vs V2 Evaluierung)
 - Code-Kommentare durchgehen (alle Funktionen sind dokumentiert)
 
@@ -364,16 +366,16 @@ python run_factcheck_v2.py --mode sample --limit 5 --parallel 5
 
 ## Fragen?
 
-**Jakob erreichen:**
+**Projektleitung erreichen:**
 - Email: drjakobvicari@gmail.com
-- Projekt-Ordner: Hier im Google Drive
+- Projekt-Ordner: siehe Google Drive
 
 **Bei Problemen:**
 1. Checke `README.md` (Projekt-Übersicht)
 2. Checke `ARCHITEKTUR.md` (technische Details)
 3. Schau dir Inline-Kommentare im Code an
-4. Schreib Jakob
+4. Melde dich beim Team
 
 ---
 
-**Viel Erfolg, Till! Das System läuft stabil, du kannst direkt loslegen.**
+**Viel Erfolg! Das System läuft stabil, du kannst direkt loslegen.**

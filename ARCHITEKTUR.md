@@ -1,6 +1,6 @@
 # Technische Architektur: KI-Produkt-Faktencheck
 
-**Für:** Till (Code-Review & Weiterentwicklung)
+**Für:** Entwickler:innen (Code-Review & Weiterentwicklung)
 **Von:** Jakob
 **Datum:** 24. April 2026
 
@@ -910,7 +910,7 @@ Scholar/PubMed:  0 Calls (Perplexity reichte aus)
 
 ---
 
-## Empfehlungen für Till
+## Empfehlungen zur Weiterentwicklung
 
 ### Sofort prüfen
 

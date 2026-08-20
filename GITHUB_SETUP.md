@@ -183,7 +183,7 @@ Folgende Dateien/Ordner sind in `.gitignore` und **nicht** auf GitHub:
 - `README.md`
 - `ARCHITEKTUR.md`
 - `ENTWICKLER_DEEP_DIVE.md`
-- `QUICK_START_TILL.md`
+- `QUICK_START.md`
 - `RESULTS_SUMMARY_MONTAG.md`
 - `FACTCHECK_V2_VERGLEICH.md`
 
@@ -262,7 +262,7 @@ Nach dem ersten Push auf GitHub:
 3. ✅ GitHub Repo erstellen
 4. ✅ Push
 5. ✅ README auf GitHub prüfen
-6. Optional: Till als Collaborator einladen
+6. Optional: Teammitglieder als Collaborator:innen einladen
 7. Optional: GitHub Actions für Tests einrichten
 
 ---

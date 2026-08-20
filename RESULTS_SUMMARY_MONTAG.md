@@ -212,7 +212,7 @@ Wichtig:         Perplexity lief perfekt (27/27 erfolgreich)
 
 ### Sofort (Montag)
 
-1. **Till onboarden**: QUICK_START_TILL.md + README.md bereitstellen
+1. **Team onboarden**: QUICK_START.md + README.md bereitstellen
 2. **Code-Review**: Ist die Architektur verständlich?
 3. **Ergebnisse durchsehen**: Sind Bewertungen nachvollziehbar?
 
@@ -334,7 +334,7 @@ Ein vollautomatisiertes System, das KI-generierte Claims über Produkt extrahier
 
 **Was sind die nächsten Schritte?**
 
-1. **Sofort:** Code-Review mit Till
+1. **Sofort:** Code-Review im Team
 2. **Diese Woche:** Perplexity-Stabilität verbessern (Retry, Circuit Breaker)
 3. **Nächste 2 Wochen:** Alternative Quellen + Produktionisierung
 

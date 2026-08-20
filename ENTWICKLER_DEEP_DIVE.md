@@ -1,6 +1,6 @@
 # Entwickler Deep Dive: Claim-Aufbereitung & Deduplication
 
-**Für:** Till (Entwickler)
+**Für:** Entwickler:innen
 **Komplexität:** Advanced
 **Fokus:** Technische Implementation Details der Pre-Processing Pipeline
 
@@ -829,12 +829,12 @@ test -f claims_factchecked.csv && echo "✓ Fact-Check OK"
 
 ---
 
-## Nächste Schritte für Till
+## Nächste Schritte
 
 ### Sofort
 
 1. ✅ Code lesen: `run_extraction_v2.py` + `dedup_claims.py`
-2. ✅ Test-Run durchführen (siehe QUICK_START_TILL.md)
+2. ✅ Test-Run durchführen (siehe QUICK_START.md)
 3. ✅ Ergebnisse inspizieren:
    ```bash
    # Top-10 Cluster

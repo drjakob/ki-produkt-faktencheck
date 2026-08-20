@@ -3,7 +3,6 @@
 **Status:** Proof-of-Concept abgeschlossen
 **Datum:** 24. April 2026
 **Entwickler:** Jakob (mit Claude Code)
-**Review:** Till
 
 ---
 
@@ -31,13 +30,13 @@ Accuracy: 85,6% (bei prüfbaren Claims)
 
 ---
 
-## Schnellstart für Till
+## Schnellstart
 
 ### 1. Setup (einmalig)
 
 ```bash
 # Navigiere zum Projekt
-cd "/Users/3g2-43a-u1/Library/CloudStorage/GoogleDrive-drjakobvicari@gmail.com/Meine Ablage/HSH-2025/JakobsProjekte2025/Produktreporting/Faktenchecker"
+cd /pfad/zum/Faktenchecker
 
 # Erstelle Virtual Environment
 python3 -m venv venv_extraction
@@ -249,7 +248,7 @@ CC0798;20-30% Soja im Produktkuh-Futter;FALSCH;0.85;Nur 9,9-19,8% laut Studien;E
 
 ---
 
-## Nächste Schritte (für Till)
+## Nächste Schritte
 
 ### Sofort prüfen
 
@@ -308,4 +307,4 @@ API-Calls:
 
 ---
 
-**Viel Erfolg, Till! Bei Fragen melde dich bei Jakob.**
+**Viel Erfolg! Bei Fragen melde dich beim Team.**
