@@ -12,28 +12,8 @@ credentials/
 # DATA FILES (enthalten vertrauliche/proprietäre Inhalte)
 # ============================================================
 
-# Input-Daten (AI-Responses)
-Responses-*.csv
-*-Responses.csv
-responses_*.csv
-
-# Extracted Claims
-claims_*.csv
-!claims_sample.csv  # Ausnahme: Sample-Daten für Demo
-
-# Canonical Claims
-claims_canonical.csv
-claim_clusters.csv
-
-# Fact-Checked Results
-claims_factchecked*.csv
-factcheck_*.csv
-
-# Interim/Test Data
-test_*.csv
-pilot_*.csv
-sample_*.csv
-short_answers.csv
+output/
+logs/
 
 # ============================================================
 # CACHE & TEMPORARY FILES
