@@ -20,7 +20,7 @@
 ### 1. Git Repository initialisieren
 
 ```bash
-cd "/Users/3g2-43a-u1/Library/CloudStorage/GoogleDrive-drjakobvicari@gmail.com/Meine Ablage/HSH-2025/JakobsProjekte2025/Produktreporting/Faktenchecker"
+cd /pfad/zum/Faktenchecker
 
 # Git initialisieren
 git init
@@ -54,7 +54,7 @@ git commit -m "Initial commit: KI-Produkt-Faktencheck System
 
 **Option A: Via GitHub Web UI**
 1. Gehe zu https://github.com/new
-2. Repository Name: `ki-milch-faktencheck` (oder dein Wunschname)
+2. Repository Name: `ki-produkt-faktencheck` (oder dein Wunschname)
 3. Description: "Automatisiertes Fact-Checking System für KI-generierte Claims"
 4. **Public** oder **Private** (deine Wahl)
 5. **NICHT** "Initialize with README" ankreuzen (haben wir schon!)
@@ -63,7 +63,7 @@ git commit -m "Initial commit: KI-Produkt-Faktencheck System
 **Option B: Via GitHub CLI**
 ```bash
 # Falls gh installiert ist
-gh repo create ki-milch-faktencheck \
+gh repo create ki-produkt-faktencheck \
   --description "Automatisiertes Fact-Checking System" \
   --public  # oder --private
 ```
@@ -72,10 +72,10 @@ gh repo create ki-milch-faktencheck \
 
 ```bash
 # Remote hinzufügen (ersetze USERNAME)
-git remote add origin https://github.com/USERNAME/ki-milch-faktencheck.git
+git remote add origin https://github.com/USERNAME/ki-produkt-faktencheck.git
 
 # Oder SSH:
-# git remote add origin git@github.com:USERNAME/ki-milch-faktencheck.git
+# git remote add origin git@github.com:USERNAME/ki-produkt-faktencheck.git
 
 # Branch umbenennen (falls nötig)
 git branch -M main
@@ -127,7 +127,7 @@ git status --ignored
 
 ### README auf GitHub prüfen
 
-1. Gehe zu `https://github.com/USERNAME/ki-milch-faktencheck`
+1. Gehe zu `https://github.com/USERNAME/ki-produkt-faktencheck`
 2. Prüfe, dass README.md korrekt rendert
 3. Prüfe, dass **KEINE Secrets** sichtbar sind
 
@@ -138,7 +138,7 @@ git status --ignored
 # Settings → Collaborators → Add people
 
 # Oder via CLI:
-gh repo invite-user USERNAME --repo ki-milch-faktencheck
+gh repo invite-user USERNAME --repo ki-produkt-faktencheck
 ```
 
 ---

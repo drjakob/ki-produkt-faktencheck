@@ -1,5 +1,12 @@
 # Airtable Layer 0 - Quick Start Guide
 
+> **Airtable-Doku im Überblick** – es gibt drei aufeinander aufbauende Dokumente:
+> - **📖 AIRTABLE_SETUP.md** — Referenz: Schema, Feldtypen, API-Konzept, Kosten
+> - **🔧 AIRTABLE_INTEGRATION_SCHRITTE.md** — Tutorial: Tabelle Schritt für Schritt in Airtable anlegen
+> - **🚀 AIRTABLE_QUICKSTART.md** (dieses Dokument) — Workflow: Opus Research → Import → Fact-Check-Run im Betrieb
+>
+> Aktueller Stand: **V8**, Semantic-Search-Threshold **0.75**.
+
 Komplette Anleitung zur Nutzung der kuratierten Fakten-Datenbank als Layer 0.
 
 ---
@@ -10,7 +17,7 @@ Komplette Anleitung zur Nutzung der kuratierten Fakten-Datenbank als Layer 0.
 
 ```bash
 # Folge der detaillierten Anleitung in AIRTABLE_SETUP.md
-# - Öffne bestehende Base "KI-Milch-Monitor"
+# - Öffne bestehende Base "KI-Produkt-Monitor"
 # - Erstelle neue Tabelle "verified_facts" (siehe Schema in AIRTABLE_SETUP.md)
 # - Erstelle Personal Access Token (falls noch nicht vorhanden)
 # - Kopiere Base ID aus URL (appXXXXXXXXXXXXXX)
@@ -36,7 +43,7 @@ pip install pyairtable>=2.3.0  # Falls noch nicht installiert
 
 ---
 
-## 📊 Workflow: Opus Research → Airtable → V5
+## 📊 Workflow: Opus Research → Airtable → V8
 
 ### Phase 1: Opus Deep Research (EINMALIG)
 
@@ -86,12 +93,12 @@ python airtable_import.py --mode list
 
 ---
 
-### Phase 3: V5 Fact-Checking mit Airtable Layer 0
+### Phase 3: V8 Fact-Checking mit Airtable Layer 0
 
 **Automatisch aktiv** sobald Environment Variables gesetzt sind!
 
 ```bash
-# Normaler V5 Run (Airtable wird zuerst geprüft)
+# Normaler V8 Run (Airtable wird zuerst geprüft)
 export ANTHROPIC_API_KEY="sk-ant-..."
 export PERPLEXITY_API_KEY="pplx-..."
 export USDA_API_KEY="..."
@@ -102,11 +109,11 @@ export AIRTABLE_BASE_ID="app..."
 python run_factcheck_v3_improved.py \
   --mode all \
   --parallel 20 \
-  --output claims_factchecked_v5_airtable.csv
+  --output claims_factchecked_v8_airtable.csv
 ```
 
 **Layer-Order:**
-1. **Layer 0 (Airtable):** Semantic Search (0.85 Threshold) ← Checked FIRST!
+1. **Layer 0 (Airtable):** Semantic Search (0.75 Threshold, V8) ← Checked FIRST!
 2. Layer 1 (Perplexity): Web-Suche
 3. Layer 2 (USDA): Nährwertdaten
 4. Layer 3 (Semantic Scholar): Wissenschaft
@@ -145,7 +152,7 @@ python airtable_search.py \
   --claim "Milch enthält 500% mehr Kalzium als Brokkoli"
 
 # Output:
-# Kein Match gefunden (Similarity < 0.85)
+# Kein Match gefunden (Similarity < 0.75)
 ```
 
 ---
@@ -206,13 +213,13 @@ else:
     print(f"✗ Cache abgelaufen oder nicht vorhanden")
 ```
 
-### V5 Layer-Usage-Stats
+### V8 Layer-Usage-Stats
 
-Nach V5 Full-Run:
+Nach V8 Full-Run:
 
 ```bash
 # Zähle source_type=airtable
-grep -c '"airtable"' claims_factchecked_v5_airtable.csv
+grep -c '"airtable"' claims_factchecked_v8_airtable.csv
 
 # Erwartete Hit-Rate (bei 100 kuratierten Facts):
 # - Top-100 Claims: ~70-80% Airtable-Hits
@@ -276,16 +283,16 @@ Normal bei neuen Claims. Verifikationen:
 2. Prüfe Airtable Base (sind Facts vorhanden?)
 3. Test mit bekanntem Claim (siehe Testing-Sektion)
 
-### Similarity immer < 0.85
+### Similarity immer < 0.75 (Standard-Threshold seit V8)
 
 ```python
-# Threshold zu konservativ? Test mit niedrigerem Wert:
+# Threshold testweise anpassen:
 python airtable_search.py \
   --claim "..." \
-  --threshold 0.75  # Experimentell
+  --threshold 0.70  # niedriger = mehr Matches, aber mehr False Positives
 ```
 
-**ACHTUNG:** Threshold < 0.85 kann False Positives erzeugen!
+**ACHTUNG:** Threshold < 0.75 kann False Positives erzeugen! 0.75 ist der in V8 optimierte Standard (vorher 0.85).
 
 ---
 
@@ -295,9 +302,9 @@ python airtable_search.py \
 - **airtable_import.py:** Code für Opus → Airtable Import
 - **airtable_search.py:** Semantic Search Implementation
 - **opus_research_batch.py:** Opus 4.7 Deep Research Script
-- **run_factcheck_v3_improved.py:** V5 Main Script (mit Layer 0)
+- **run_factcheck_v3_improved.py:** V8 Main Script (mit Layer 0)
 
 ---
 
-**Status:** V5 Airtable Layer 0 vollständig implementiert und getestet ✓
-**Next Steps:** Opus Full-Run (100 Claims) → Airtable Import → V5 Production Run
+**Status:** V8 Airtable Layer 0 vollständig implementiert und getestet ✓
+**Next Steps:** Opus Full-Run (100 Claims) → Airtable Import → V8 Production Run

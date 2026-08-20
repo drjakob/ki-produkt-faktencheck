@@ -1,12 +1,19 @@
-# Airtable Integration in "KI-Milch-Monitor" - Schritt-für-Schritt
+# Airtable Integration in "KI-Produkt-Monitor" - Schritt-für-Schritt
+
+> **Airtable-Doku im Überblick** – es gibt drei aufeinander aufbauende Dokumente:
+> - **📖 AIRTABLE_SETUP.md** — Referenz: Schema, Feldtypen, API-Konzept, Kosten
+> - **🔧 AIRTABLE_INTEGRATION_SCHRITTE.md** (dieses Dokument) — Tutorial: Tabelle Schritt für Schritt in Airtable anlegen
+> - **🚀 AIRTABLE_QUICKSTART.md** — Workflow: Opus Research → Import → Fact-Check-Run im Betrieb
+>
+> Aktueller Stand: **V8**, Semantic-Search-Threshold **0.75**.
 
 Kurzanleitung zur Integration der `verified_facts` Tabelle in deine bestehende Airtable Base.
 
 ---
 
-## Schritt 1: Neue Tabelle in KI-Milch-Monitor erstellen
+## Schritt 1: Neue Tabelle in KI-Produkt-Monitor erstellen
 
-1. **Öffne Airtable** und navigiere zu deiner Base **"KI-Milch-Monitor"**
+1. **Öffne Airtable** und navigiere zu deiner Base **"KI-Produkt-Monitor"**
 
 2. **Erstelle neue Tabelle:**
    - Klicke auf "+" oder "Add a table"
@@ -84,17 +91,17 @@ Kurzanleitung zur Integration der `verified_facts` Tabelle in deine bestehende A
 
 1. Gehe zu https://airtable.com/create/tokens
 2. "Create new token"
-3. Name: "KI-Milch-Monitor-API"
+3. Name: "KI-Produkt-Monitor-API"
 4. Scopes auswählen:
    - ✅ `data.records:read`
    - ✅ `data.records:write`
    - ✅ `schema.bases:read`
-5. Add a base: Wähle "KI-Milch-Monitor"
+5. Add a base: Wähle "KI-Produkt-Monitor"
 6. **Create token** → Token kopieren und sicher speichern!
 
 ### 3.2 Base ID finden
 
-1. Öffne "KI-Milch-Monitor" in Airtable
+1. Öffne "KI-Produkt-Monitor" in Airtable
 2. URL sieht aus wie: `https://airtable.com/appXXXXXXXXXXXXXX/...`
 3. Kopiere `appXXXXXXXXXXXXXX` (das ist deine Base ID)
 
@@ -130,7 +137,7 @@ export VOYAGE_API_KEY="pa-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 ## Schritt 5: Dependencies installieren
 
 ```bash
-cd "/Users/3g2-43a-u1/Library/CloudStorage/GoogleDrive-drjakobvicari@gmail.com/Meine Ablage/HSH-2025/JakobsProjekte2025/Milchreporting/Faktenchecker"
+cd /pfad/zum/Faktenchecker
 
 source venv_extraction/bin/activate
 
@@ -176,7 +183,7 @@ python airtable_import.py \
 
 ## Schritt 7: Verifikation in Airtable
 
-1. Öffne "KI-Milch-Monitor" → Tabelle "verified_facts"
+1. Öffne "KI-Produkt-Monitor" → Tabelle "verified_facts"
 2. Du solltest 3 neue Records sehen:
    - FACT_0001: Methan aus Kühen...
    - FACT_0002: Etwa 20-30% des Futters...
@@ -206,10 +213,10 @@ python airtable_search.py \
 
 ---
 
-## Schritt 9: V5 Fact-Checking testen
+## Schritt 9: V8 Fact-Checking testen
 
 ```bash
-# Kleiner Test-Run mit V5 (Airtable Layer 0 aktiv)
+# Kleiner Test-Run mit V8 (Airtable Layer 0 aktiv)
 python run_factcheck_v3_improved.py \
   --mode sample \
   --limit 5 \
@@ -243,11 +250,11 @@ python airtable_import.py \
   --input opus_research_results.jsonl \
   --resume
 
-# 3. V5 Production Run
+# 3. V8 Production Run
 python run_factcheck_v3_improved.py \
   --mode all \
   --parallel 20 \
-  --output claims_factchecked_v5_full.csv
+  --output claims_factchecked_v8_full.csv
 ```
 
 ---
@@ -263,7 +270,7 @@ pip install pyairtable>=2.3.0
 ### "Invalid API token"
 - Prüfe Token in https://airtable.com/create/tokens
 - Stelle sicher, dass Scopes korrekt sind (`data.records:read`, `data.records:write`)
-- Prüfe, dass Base "KI-Milch-Monitor" hinzugefügt ist
+- Prüfe, dass Base "KI-Produkt-Monitor" hinzugefügt ist
 
 ### "Table not found: verified_facts"
 - Prüfe Tabellennamen in Airtable (exakte Schreibweise!)
@@ -278,12 +285,12 @@ pip install pyairtable>=2.3.0
 
 ## Zusammenfassung
 
-✅ Neue Tabelle `verified_facts` in "KI-Milch-Monitor" erstellt
+✅ Neue Tabelle `verified_facts` in "KI-Produkt-Monitor" erstellt
 ✅ API Token erstellt und konfiguriert
 ✅ Environment Variables gesetzt
 ✅ Test-Import erfolgreich (3 Facts)
 ✅ Semantic Search funktioniert
-✅ V5 mit Airtable Layer 0 bereit!
+✅ V8 mit Airtable Layer 0 bereit!
 
 **Deine Airtable Base ist jetzt ready für das KI-Fact-Checking System!**
 

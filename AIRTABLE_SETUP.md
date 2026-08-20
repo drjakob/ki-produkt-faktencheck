@@ -1,12 +1,19 @@
 # Airtable Base Setup - Kuratierte Fakten-Datenbank
 
+> **Airtable-Doku im Überblick** – es gibt drei aufeinander aufbauende Dokumente:
+> - **📖 AIRTABLE_SETUP.md** (dieses Dokument) — Referenz: Schema, Feldtypen, API-Konzept, Kosten
+> - **🔧 AIRTABLE_INTEGRATION_SCHRITTE.md** — Tutorial: Tabelle Schritt für Schritt in Airtable anlegen
+> - **🚀 AIRTABLE_QUICKSTART.md** — Workflow: Opus Research → Import → Fact-Check-Run im Betrieb
+>
+> Aktueller Stand: **V8**, Semantic-Search-Threshold **0.75**.
+
 ## Übersicht
 
-Die Airtable-Integration nutzt deine **bestehende Base "KI-Milch-Monitor"** und fügt dort eine neue Tabelle hinzu. Diese dient als **Layer 0** im Hybrid-Search-System und wird **als erstes** durchsucht, bevor Perplexity/USDA/Semantic Scholar/OpenAlex verwendet werden.
+Die Airtable-Integration nutzt deine **bestehende Base "KI-Produkt-Monitor"** und fügt dort eine neue Tabelle hinzu. Diese dient als **Layer 0** im Hybrid-Search-System und wird **als erstes** durchsucht, bevor Perplexity/USDA/Semantic Scholar/OpenAlex verwendet werden.
 
 **Konzept:** Manuell kuratierte, verifizierte Fakten aus Opus 4.7 Deep Research, die mit semantischer Suche gegen eingehende Claims abgeglichen werden.
 
-**Setup:** Neue Tabelle `verified_facts` in bestehender Base "KI-Milch-Monitor" erstellen.
+**Setup:** Neue Tabelle `verified_facts` in bestehender Base "KI-Produkt-Monitor" erstellen.
 
 ## Base-Struktur
 
@@ -94,9 +101,9 @@ python airtable_import.py \
 
 ## Airtable API Setup
 
-### 1. Bestehende Base "KI-Milch-Monitor" verwenden
+### 1. Bestehende Base "KI-Produkt-Monitor" verwenden
 
-1. Öffne deine bestehende Airtable Base **"KI-Milch-Monitor"**
+1. Öffne deine bestehende Airtable Base **"KI-Produkt-Monitor"**
 2. Erstelle eine **neue Tabelle** namens `verified_facts`
 3. Konfiguriere die Felder gemäß Schema oben (siehe "Base-Struktur")
 
@@ -111,7 +118,7 @@ python airtable_import.py \
 
 ### 3. Base ID finden
 
-1. Öffne deine Base "KI-Milch-Monitor" in Airtable
+1. Öffne deine Base "KI-Produkt-Monitor" in Airtable
 2. URL hat Format: `https://airtable.com/appXXXXXXXXXXXXXX/...`
 3. `appXXXXXXXXXXXXXX` ist deine Base ID (die Base ID ist für ALLE Tabellen in der Base gleich!)
 
@@ -170,10 +177,10 @@ records = table.all(formula="{category} = 'Emissionen'")
 2. **Claim-Matching:**
    - Generiere Embedding für eingehenden Claim
    - Berechne Cosine-Similarity zu allen `fact_embeddings`
-   - Threshold: 0.85 (sehr konservativ, nur hochrelevante Matches)
+   - Threshold: 0.75 (V8-Optimierung; ursprünglich 0.85, für mehr Airtable-Matches gesenkt)
 
 3. **Fallback:**
-   - Falls kein Match > 0.85: Weiter zu Perplexity (Layer 1)
+   - Falls kein Match > 0.75: Weiter zu Perplexity (Layer 1)
 
 ### Implementation
 
@@ -216,7 +223,7 @@ Start mit **Free Tier** (1.200 records ausreichend für Top-100 + manuelle Erwei
 1. **Airtable Base erstellen** (manuell via Web UI)
 2. **`airtable_import.py` implementieren** (Opus JSON → Airtable)
 3. **`airtable_search.py` implementieren** (Semantic Search Layer)
-4. **Layer 5 in `run_factcheck_v3_improved.py` integrieren**
+4. **Layer 0 in `run_factcheck_v3_improved.py` integrieren**
 
 ---
 
