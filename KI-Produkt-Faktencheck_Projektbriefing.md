@@ -141,7 +141,7 @@ Die Bewertung. Ein Eintrag pro Claim.
 **Kostenschätzung:** ~2 Mio Tokens gesamt; mit Opus ca. 40 bis 60 Euro.
 **Laufzeit:** ein Abend mit paralleler Batch-Verarbeitung.
 
-**Qualitätskontrolle:** Pilot auf **20 zufällig gezogenen Antworten** zuerst. Gianna oder Till reviewen manuell; erst wenn die Extraktion stabil wirkt, geht es auf die 696.
+**Qualitätskontrolle:** Pilot auf **20 zufällig gezogenen Antworten** zuerst. Das Datenteam reviewt manuell; erst wenn die Extraktion stabil wirkt, geht es auf die 696.
 
 ### Phase B · Semantisches Dedup (Voyage + Opus)
 
@@ -150,7 +150,7 @@ Die Bewertung. Ein Eintrag pro Claim.
 **Opus-Rolle:** Schlägt pro Cluster die kanonische Formulierung vor; kommentiert Grenzfälle.
 **Output:** ~200 bis 500 kanonische Claims.
 
-**Qualitätskontrolle:** Manuelles Review der Grenzfälle (Similarity 0.75 bis 0.85). Gianna oder Till vergibt finale canonical labels.
+**Qualitätskontrolle:** Manuelles Review der Grenzfälle (Similarity 0.75 bis 0.85). Das Datenteam vergibt finale canonical labels.
 
 ### Phase C · Opus-Fact-Check mit Gegenprüfung
 
@@ -175,7 +175,7 @@ Die Bewertung. Ein Eintrag pro Claim.
 **Kathis Aufgabe:**
 
 - **🟢 einfach** · Opus-Konsens bei trivialen Claims (Nährwerte, Definitionen); nur Stichprobenprüfung durch Datenteam nötig
-- **🟡 mittel** · Opus-Vorschlag plausibel, braucht Datenteam-Review (Helen/Till/Gianna), keine externe Fachperson
+- **🟡 mittel** · Opus-Vorschlag plausibel, braucht Datenteam-Review, keine externe Fachperson
 - **🔴 komplex** · ernährungsmedizinisch heikel, strittig, oder Branchenkontext; geht an Nutrition Hub **(max. 150)** oder Hendrik Haase
 - **⚫ verworfen** · kein echter Claim, Dubletten, nicht prüfbare Werturteile
 
@@ -208,13 +208,13 @@ Die Bewertung. Ein Eintrag pro Claim.
 |-------|--------|---------|------------|
 | Projektleitung | Jakob (tactile.news) | Methodik, Freigabe, Whitepaper-Integration | laufend |
 | LLM-Automation | Claude Opus 4.7 (2 Instanzen) | Extraktion, Dedup-Vorschlag, Score-Vorschlag, Web Search | API-Kosten ~150 Euro |
-| Datenteam | Helen, Till, Gianna | Pilot-Review, Dedup-Grenzfälle, URL-Verifikation, Orchestrierung | 20 bis 30 h |
+| Datenteam | — | Pilot-Review, Dedup-Grenzfälle, URL-Verifikation, Orchestrierung | 20 bis 30 h |
 | Triage | Kathi Böhmer | Rohprüfung, Vorsortierung, Queue-Verteilung | ~15 h |
 | Fachgutachten 1 | Nutrition Hub | max. 150 priorisierte Claims | ~25 h |
 | Fachgutachten 2 | Hendrik Haase | ~30 bis 60 praxisnahe Claims | ~5 h |
 | Auftraggeber | Initiative Produkt (Kerstin Wriedt) | Sieht Ergebnisse, bewertet nicht | review-Termine |
 
-**Gesamt-Menschzeit: 65 bis 75 Stunden**, verteilt auf sechs Personen; parallelisiert in ~1,5 Wochen machbar.
+**Gesamt-Menschzeit: 65 bis 75 Stunden**, verteilt auf mehrere Rollen; parallelisiert in ~1,5 Wochen machbar.
 
 **Regel gegen Bias-Vorwürfe:** Die Initiative Produkt sieht das Ergebnis, **bewertet aber nicht**. Scoring-Entscheidungen liegen bei Kathi (Triage), Datenteam, Nutrition Hub und Haase.
 
