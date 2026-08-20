@@ -15,6 +15,11 @@ credentials/
 output/
 logs/
 
+# Alle CSV-Datendateien (Claims, Responses, Team-Prompts etc.)
+# gehören NICHT ins Repo. Ausnahmen unten unter "KEEP THESE".
+*.csv
+team-prompts_sprint_fragen_fleisch.csv
+
 # ============================================================
 # CACHE & TEMPORARY FILES
 # ============================================================
