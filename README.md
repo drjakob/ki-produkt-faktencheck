@@ -4,6 +4,9 @@
 **Datum:** 24. April 2026
 **Entwickler:** Jakob (mit Claude Code)
 
+> **Aktuelle Version: V8** – Haupt-Script ist `run_factcheck_v3_improved.py` (5-Layer Hybrid inkl. Airtable-Layer 0).
+> Die V2-Beispiele und -Kennzahlen weiter unten sind historisch dokumentiert. Für den Schnelleinstieg siehe `QUICK_START.md`.
+
 ---
 
 ## Was ist das Projekt?
@@ -74,13 +77,14 @@ cat test_output.csv
 | Datei | Was ist das? |
 |-------|--------------|
 | `README.md` | **DIESE DATEI** - Projekt-Übersicht |
+| `QUICK_START.md` | Schnelleinstieg in 15 Minuten |
 | `ARCHITEKTUR.md` | Technische Architektur-Dokumentation |
-| `FACTCHECK_V2_VERGLEICH.md` | V1 vs V2 Evaluierung |
-| `run_factcheck_v2.py` | **Haupt-Script** für Fact-Checking (Hybrid Search) |
-| `run_factcheck_v3.py` | Erweiterte Version mit 4-Layer-Fallback |
+| `FACTCHECK_V2_VERGLEICH.md` | V1 vs V2 Evaluierung (historisch) |
+| `run_factcheck_v3_improved.py` | **Haupt-Script** für Fact-Checking (V8, 5-Layer Hybrid inkl. Airtable) |
+| `run_factcheck_v2.py` | Ältere Version (Perplexity + Scholar), einfacher Aufbau |
 | `dedup_claims.py` | Claim-Deduplizierung via Embeddings |
 | `claims_canonical.csv` | **1.046 deduplizierte Claims** (Input) |
-| `claims_factchecked_v2_full.csv` | **Full-Run Ergebnisse** (Output) |
+| `claims_factchecked_v8_lower_threshold.csv` | **Aktuellste Full-Run Ergebnisse** (Output, V8) |
 
 ---
 
@@ -252,8 +256,8 @@ CC0798;20-30% Soja im Produktkuh-Futter;FALSCH;0.85;Nur 9,9-19,8% laut Studien;E
 
 ### Sofort prüfen
 
-1. **Setup testen**: Läuft `run_factcheck_v2.py --mode sample --limit 10`?
-2. **V2 Full-Run Ergebnisse**: `claims_factchecked_v2_full.csv` durchsehen
+1. **Setup testen**: Läuft `run_factcheck_v3_improved.py --mode sample --limit 10`?
+2. **Full-Run Ergebnisse**: `claims_factchecked_v8_lower_threshold.csv` (V8) durchsehen
 3. **Code-Review**: Ist die Architektur verständlich?
 
 ### Verbesserungsideen
